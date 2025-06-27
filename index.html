@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Explainer: Model Context Protocol (MCP)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Neutral Tech -->
+    <!-- Application Structure Plan: The application is designed as a single-page, linear narrative that guides the user from the problem (pre-MCP AI) to the solution (MCP) and its benefits. This storytelling approach is more engaging for a non-technical audience than a dashboard. Key interactions include hover-activated tooltips on diagrams to explain components and a click-to-animate final diagram that demonstrates MCP in action. This structure was chosen to make a complex technical concept intuitive and easy to follow by building the idea step-by-step. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: The core concepts from the MCP presentation slides.
+        - Goal: To inform, compare, and demonstrate change.
+        - Viz/Presentation Method: All diagrams are built using styled HTML divs and CSS, avoiding SVG/Mermaid as required. The goal is to create clean, infographic-style visuals.
+        - Interaction: Hover effects on diagrams provide contextual information without cluttering the UI. A click-based animation in the final section provides a "wow factor" and actively demonstrates the protocol's function.
+        - Justification: Interactive diagrams are more engaging and educational than static images. The click-to-animate flow makes the abstract concept of an AI "acting" concrete.
+        - Library/Method: Vanilla JavaScript for all interactions, Tailwind CSS for styling.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        .diagram-box {
+            transition: all 0.3s ease;
+        }
+        .diagram-line {
+            position: absolute;
+            background-color: currentColor;
+            transition: all 0.3s ease;
+        }
+        .tooltip {
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 10;
+        }
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .flow-path {
+            transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+        }
+        .flow-active {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: white;
+        }
+        .flow-line-active {
+            background-color: #2563eb; /* bg-blue-600 */
+            height: 4px !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Understanding MCP</h1>
+            <p class="mt-4 text-lg text-slate-600">The Universal Adapter for AI</p>
+        </header>
+
+        <!-- Section 1: The Smart but Stuck AI -->
+        <section id="intro" class="mb-24 text-center">
+            <div class="flex justify-center mb-6">
+                <div class="text-6xl bg-blue-100 rounded-full p-4">🧠</div>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">Your AI Assistant: Super Smart, But...</h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                Imagine your AI is incredibly smart, like a brilliant person with vast knowledge. However, until recently, it's been **stuck in its own "brain"**. It couldn't easily connect to your everyday apps and services. It knew a lot, but it couldn't *do* much in the real world on its own.
+            </p>
+        </section>
+
+        <!-- Section 2: The Old Problem -->
+        <section id="problem" class="mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">The Old Way: A Mess of Wires 🚧</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    Before MCP, every time an AI needed to use an app, a developer had to build a fragile, custom connection. This approach was messy, expensive, and didn't scale. Hover over the diagram elements to see why.
+                </p>
+            </div>
+            <div id="diagram-problem" class="relative w-full h-80 md:h-96 flex items-center justify-center">
+                <!-- Central AI -->
+                <div class="relative has-tooltip">
+                    <div class="diagram-box bg-red-200 text-red-800 p-4 rounded-lg shadow-md w-32 text-center">AI Brain</div>
+                    <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">The core AI model.</div>
+                </div>
+                <!-- App Boxes -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 md:left-10 md:top-10 md:transform-none has-tooltip">
+                    <div class="diagram-box bg-purple-200 text-purple-800 p-3 rounded-lg shadow-md">Your Email</div>
+                    <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">An external service.</div>
+                </div>
+                <div class="absolute bottom-0 right-0 md:right-10 md:bottom-10 has-tooltip">
+                    <div class="diagram-box bg-cyan-200 text-cyan-800 p-3 rounded-lg shadow-md">Weather App</div>
+                    <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">Another external service.</div>
+                </div>
+                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 md:left-10 md:bottom-10 md:transform-none has-tooltip">
+                    <div class="diagram-box bg-green-200 text-green-800 p-3 rounded-lg shadow-md">Calendar</div>
+                    <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">Yet another service.</div>
+                </div>
+                <!-- Lines -->
+                <div class="absolute w-full h-full flex items-center justify-center pointer-events-none">
+                    <div class="relative w-full h-full">
+                        <div class="relative has-tooltip w-1/3 h-2 rotate-45 absolute top-1/3 left-1/4">
+                             <div class="w-full h-full bg-red-400 opacity-75 rounded"></div>
+                             <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">Custom, fragile connection</div>
+                        </div>
+                        <div class="relative has-tooltip w-1/3 h-2 -rotate-45 absolute top-1/2 left-1/4">
+                             <div class="w-full h-full bg-red-400 opacity-75 rounded"></div>
+                              <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">Inconsistent implementation</div>
+                        </div>
+                        <div class="relative has-tooltip w-1/4 h-2 rotate-12 absolute top-1/2 right-1/4">
+                              <div class="w-full h-full bg-red-400 opacity-75 rounded"></div>
+                              <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">Hard to maintain</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: The Solution -->
+        <section id="solution" class="mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">The Solution: Model Context Protocol (MCP) 🔌</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    MCP acts like a **universal adapter**, or the "USB-C for AI." It's a single, open standard that lets the AI connect to any tool through a special "adapter" that speaks both languages. Hover over the yellow box to learn more.
+                </p>
+            </div>
+            <div id="diagram-solution" class="relative w-full h-96 flex flex-col items-center justify-center">
+                <!-- AI Assistant -->
+                <div class="diagram-box bg-green-200 text-green-800 p-4 rounded-lg shadow-md mb-8">AI Assistant</div>
+
+                <!-- Central Adapter -->
+                <div class="w-2 h-8 bg-slate-400"></div>
+                <div class="relative has-tooltip">
+                    <div class="diagram-box bg-yellow-300 text-yellow-900 p-4 rounded-lg shadow-lg">MCP Adapter</div>
+                    <div class="tooltip bg-slate-800 text-white text-xs rounded py-1 px-2">This "server" translates AI requests into actions a specific tool can understand.</div>
+                </div>
+                <div class="w-full h-2 bg-slate-400 mt-[-4px] max-w-md"></div>
+
+                <!-- Service Grid -->
+                <div class="w-full max-w-md flex justify-around mt-[-4px]">
+                    <div class="w-2 h-8 bg-slate-400"></div>
+                    <div class="w-2 h-8 bg-slate-400"></div>
+                    <div class="w-2 h-8 bg-slate-400"></div>
+                </div>
+
+                <div class="flex justify-around w-full max-w-2xl mt-4">
+                    <div class="diagram-box bg-purple-200 text-purple-800 p-3 rounded-lg shadow-md">Your Email</div>
+                    <div class="diagram-box bg-cyan-200 text-cyan-800 p-3 rounded-lg shadow-md">Weather App</div>
+                    <div class="diagram-box bg-orange-200 text-orange-800 p-3 rounded-lg shadow-md">Shopping App</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: AI in Action -->
+        <section id="action" class="mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">What AI Can Do Now! 🎉</h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    With MCP, your AI becomes a true "doer." It can interact with apps to complete tasks on your behalf. **Click the buttons below** to see how a request flows through the system.
+                </p>
+            </div>
+
+            <!-- Interactive Buttons -->
+            <div class="flex justify-center space-x-4 mb-8">
+                <button id="action-email" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Find Email</button>
+                <button id="action-calendar" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Book Meeting</button>
+                <button id="action-reset" class="bg-slate-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-600 transition">Reset</button>
+            </div>
+            
+            <!-- Action Diagram -->
+            <div id="diagram-action" class="relative w-full h-[30rem] grid grid-cols-4 grid-rows-3 gap-x-4 items-center">
+                <!-- Column 1 -->
+                <div id="ask-ai" class="flow-path col-start-1 row-start-2 bg-blue-100 text-blue-800 p-4 rounded-lg shadow-md text-center">You Ask AI</div>
+
+                <!-- Column 2 -->
+                <div id="ai-brain" class="flow-path col-start-2 row-start-2 bg-green-100 text-green-800 p-4 rounded-lg shadow-md text-center">AI Brain + MCP</div>
+
+                <!-- Column 3 -->
+                <div id="email-service" class="flow-path col-start-3 row-start-1 bg-purple-100 text-purple-800 p-4 rounded-lg shadow-md text-center">Email Service</div>
+                <div id="calendar-service" class="flow-path col-start-3 row-start-3 bg-green-100 text-green-800 p-4 rounded-lg shadow-md text-center">Calendar App</div>
+                
+                <!-- Column 4 -->
+                <div id="email-result" class="flow-path col-start-4 row-start-1 bg-sky-200 text-sky-800 p-4 rounded-lg shadow-md text-center">Found Email!</div>
+                <div id="calendar-result" class="flow-path col-start-4 row-start-3 bg-sky-200 text-sky-800 p-4 rounded-lg shadow-md text-center">Meeting Booked!</div>
+
+                <!-- Connecting Lines -->
+                <div class="absolute w-full h-full pointer-events-none">
+                    <!-- Ask -> Brain -->
+                    <div id="line-ask-brain" class="flow-path diagram-line left-[22%] top-1/2 w-[8%] h-2 bg-slate-300"></div>
+                    <!-- Brain -> Services -->
+                    <div id="line-brain-email" class="flow-path diagram-line left-[45%] top-[33%] w-[6%] h-[17%] bg-slate-300" style="transform: skewY(-45deg);"></div>
+                    <div id="line-brain-calendar" class="flow-path diagram-line left-[45%] top-[50%] w-[6%] h-[17%] bg-slate-300" style="transform: skewY(45deg);"></div>
+                     <!-- Services -> Results -->
+                    <div id="line-email-result" class="flow-path diagram-line left-[72%] top-[16.6%] w-[8%] h-2 bg-slate-300"></div>
+                    <div id="line-calendar-result" class="flow-path diagram-line left-[72%] top-[83.3%] w-[8%] h-2 bg-slate-300"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Benefits -->
+        <section id="benefits" class="py-16 bg-white rounded-xl shadow-lg">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">The Big Benefits 🚀</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-8">
+                <div>
+                    <div class="text-4xl mb-4">✅</div>
+                    <h3 class="text-xl font-bold mb-2">AI Can *Do* More</h3>
+                    <p class="text-slate-600">AI moves from being a "knower" to a "doer," actively helping you with tasks.</p>
+                </div>
+                <div>
+                    <div class="text-4xl mb-4">👩‍💻</div>
+                    <h3 class="text-xl font-bold mb-2">Easier for Developers</h3>
+                    <p class="text-slate-600">A single standard means less custom work and faster development of new AI features.</p>
+                </div>
+                 <div>
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h3 class="text-xl font-bold mb-2">More Secure & Scalable</h3>
+                    <p class="text-slate-600">Standardized connections allow for better security protocols and easier scaling.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailButton = document.getElementById('action-email');
+            const calendarButton = document.getElementById('action-calendar');
+            const resetButton = document.getElementById('action-reset');
+
+            const elements = {
+                askAI: document.getElementById('ask-ai'),
+                aiBrain: document.getElementById('ai-brain'),
+                emailService: document.getElementById('email-service'),
+                calendarService: document.getElementById('calendar-service'),
+                emailResult: document.getElementById('email-result'),
+                calendarResult: document.getElementById('calendar-result'),
+                lineAskBrain: document.getElementById('line-ask-brain'),
+                lineBrainEmail: document.getElementById('line-brain-email'),
+                lineBrainCalendar: document.getElementById('line-brain-calendar'),
+                lineEmailResult: document.getElementById('line-email-result'),
+                lineCalendarResult: document.getElementById('line-calendar-result'),
+            };
+
+            const resetAll = () => {
+                Object.values(elements).forEach(el => {
+                    el.classList.remove('flow-active', 'flow-line-active');
+                });
+            };
+
+            const animateFlow = (flow) => {
+                resetAll();
+                let step = 0;
+                const interval = setInterval(() => {
+                    if (step < flow.length) {
+                        const currentElement = elements[flow[step]];
+                        if (currentElement) {
+                             currentElement.classList.add(currentElement.id.startsWith('line-') ? 'flow-line-active' : 'flow-active');
+                        }
+                        step++;
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 500);
+            };
+
+            const emailFlow = ['askAI', 'lineAskBrain', 'aiBrain', 'lineBrainEmail', 'emailService', 'lineEmailResult', 'emailResult'];
+            const calendarFlow = ['askAI', 'lineAskBrain', 'aiBrain', 'lineBrainCalendar', 'calendarService', 'lineCalendarResult', 'calendarResult'];
+
+            emailButton.addEventListener('click', () => animateFlow(emailFlow));
+            calendarButton.addEventListener('click', () => animateFlow(calendarFlow));
+            resetButton.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
